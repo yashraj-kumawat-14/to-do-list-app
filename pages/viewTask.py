@@ -21,9 +21,11 @@ path.append(f"{parent_directory}/model")
 
 from Tasks import Tasks
 
-class AddTask:
-    def __init__(self, root, parentCallback=None):
+class ViewTask:
+    def __init__(self, root, taskId=None, parentCallback=None):
         self.parentCallback = parentCallback
+        self.taskId=taskId
+        
         self.root = root
         self.addTaskModal = Toplevel(root) # create a seprate window from main window using toplevel widget
         # self.addTaskModal.geometry("300x300")
@@ -76,6 +78,12 @@ class AddTask:
         
         self.saveBtn = Button(self.mainFrame, text="Save", bg="orange", fg="white", command=self.save)
         self.saveBtn.grid(row=4, column=0, columnspan=3, pady=(10, 10), sticky="we", padx=(5, 5))
+        
+        self.deleteBtn = Button(self.mainFrame, text="Delete", bg="red", fg="white", command=self.delete)
+        self.deleteBtn.grid(row=4, column=2, pady=(10, 10), sticky="we", padx=(5, 5))
+        
+        self.load_data()
+        
 
     def increase_priority(self):
         if len(self.priorityVar.get())<3:
@@ -98,23 +106,51 @@ class AddTask:
         print(f"name {name}, date {date}, priority {priority}, status {status}")
         
         if(not status or not name or not date):
-            self.messageLabel.config(text="Please fill all the details.", fg="red")
+            self.messageLabel.config(text="Please fill all the details", fg="red")
+            return None
+        if not self.taskId:
+            self.messageLabel.config(text="Task id is missing.", fg="orange")
             return None
         try:
             model = Tasks()
-            model.add_task(name=name, date=date, priority=priority, status=status)
-            self.messageLabel.config(text="Success Task is added.", fg="green")
+            model.update_task(id=self.taskId, name=name, date=date, priority=priority, status=status)
+            self.messageLabel.config(text="Success Task is updated.", fg="green")
+            self.addTaskModal.update()
+            sleep(2)
+            self.addTaskModal.destroy()
+        except Exception as e:
+            self.messageLabel.config(text="Error Task is didn't updated.", fg="red")
+            print("Error: ", e)
+    
+    def load_data(self):
+        if(self.taskId):
+            model = Tasks()
+            data = model.get_task_by_id(id=self.taskId)
+            self.taskVar.set(data[1])
+            self.dateEntry.set_date(data[4])
+            self.statusVar.set(data[3])
+            self.priorityVar.set("★"*int(data[2]))
+            
+    
+    def delete(self):
+        if not self.taskId:
+            self.messageLabel.config(text="Task id is missing.", fg="orange")
+            return None
+        
+        try:
+            model = Tasks()
+            model.delete_task(id=self.taskId)
+            self.messageLabel.config(text="Success Task is deleted.", fg="green")
             self.addTaskModal.update()
             sleep(2)
             if(self.parentCallback):
                 self.parentCallback(cmd="refresh")
             self.addTaskModal.destroy()
         except Exception as e:
-            self.messageLabel.config(text="Error Task is didn't add.", fg="red")
-            print("Error: ", e)
+            print(f"error occured {e}")
     
 if __name__ == "__main__":
     root = Tk()
-    AddTask(root)
+    ViewTask(root, taskId=8)
     root.mainloop()
 

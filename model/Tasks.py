@@ -36,8 +36,13 @@ class Tasks:
         """Fetch all tasks from the database."""
         self.cursor.execute("SELECT * FROM tasks")
         return self.cursor.fetchall()
+    
+    def get_task_by_id(self, id):
+        """Fetch all tasks from the database."""
+        self.cursor.execute("SELECT * FROM tasks WHERE id = ?", (id,))
+        return self.cursor.fetchone()
 
-    def update_task(self, task_id, name=None, priority=None, status=None):
+    def update_task(self, id, name=None, priority=None, status=None, date=None):
         """Update task details."""
         updates = []
         values = []
@@ -51,15 +56,18 @@ class Tasks:
         if status:
             updates.append("status = ?")
             values.append(status)
+        if date:
+            updates.append("date = ?")
+            values.append(date)
 
-        values.append(task_id)
+        values.append(id)
         query = f"UPDATE tasks SET {', '.join(updates)} WHERE id = ?"
         self.cursor.execute(query, values)
         self.conn.commit()
         
-    def delete_task(self, task_id):
+    def delete_task(self, id):
         """Delete a task from the database."""
-        self.cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+        self.cursor.execute("DELETE FROM tasks WHERE id = ?", (id,))
         self.conn.commit()
 
     def close(self):

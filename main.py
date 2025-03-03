@@ -1,6 +1,7 @@
 from tkinter import Tk, PhotoImage, Frame, Entry, StringVar, Button, Label, Listbox
 from tkinter.messagebox import showinfo
 from pages.addTask import AddTask
+from pages.viewTask import ViewTask
 from tkinter import ttk
 import os
 from sys import path
@@ -14,6 +15,7 @@ from Tasks import Tasks
 
 class App:
     def __init__(self, title="To-Do List Application", width=800, height=470):
+        self.data = None
         self.root = Tk()
         self.root.title(title)
         self.root.geometry(f"{width}x{height}")
@@ -48,6 +50,7 @@ class App:
         
         self.searchEntry.bind("<FocusIn>", lambda event: self.clearPlaceholder(event, self.searchQuery))
         self.searchEntry.bind("<FocusOut>", lambda event: self.putPlaceholder(event, self.searchPlaceholder, self.searchQuery))
+        self.searchEntry.bind("<KeyRelease>", self.search)
         
         self.tasksFrame = Frame(self.mainFrame, bg="orange")
         self.tasksFrame.pack(fill="both", expand=True)
@@ -55,20 +58,22 @@ class App:
         self.tasksFrame.rowconfigure(0, weight=1)
         self.tasksFrame.columnconfigure(0, weight=1)
         
-        self.tasksTable = ttk.Treeview(self.tasksFrame, columns=("task", "status", "date", "priority"))
+        self.tasksTable = ttk.Treeview(self.tasksFrame, columns=("id", "task", "status", "date", "priority"), show="headings")
         self.tasksTable.grid(row=0, column=0, sticky="nsew")
         
-        self.tasksTable.column("#0", width=40, stretch=False, anchor="center")
+        self.tasksTable.column("id", width=40, minwidth=30, anchor="center")
         self.tasksTable.column("task", width=100, minwidth=50, anchor="center")
         self.tasksTable.column("status", width=100, minwidth=50, anchor="center")
         self.tasksTable.column("date", width=100, minwidth=50, anchor="center")
         self.tasksTable.column("priority", width=100, minwidth=50, anchor="center")
         
-        self.tasksTable.heading("#0", text="id", anchor="center")
+        self.tasksTable.heading("id", text="ID", anchor="center")
         self.tasksTable.heading("task", text="Task", anchor="center")
         self.tasksTable.heading("status", text="Status", anchor="center")
         self.tasksTable.heading("date", text="Date", anchor="center")
         self.tasksTable.heading("priority", text="Priority", anchor="center")
+        
+        self.tasksTable.bind("<Double-1>", lambda event:self.viewSelected())
         
         self.actionFrame = Frame(self.mainFrame)
         self.actionFrame.pack(fill="x", side="bottom")
@@ -80,7 +85,7 @@ class App:
         self.addTaskBtn = Button(self.actionFrame, text="+  Add", font=("COPPER", 11, 'bold'))
         self.addTaskBtn.grid(row=0, column=0, sticky="we")
         
-        self.viewTaskBtn = Button(self.actionFrame, text="\U0001F441 View Selected")
+        self.viewTaskBtn = Button(self.actionFrame, text="\U0001F441 View Selected", command=self.viewSelected)
         self.viewTaskBtn.grid(row=0, column=1, sticky="we")
         
         self.addTaskBtn.bind("<Button-1>", self.addTask)
@@ -92,19 +97,55 @@ class App:
     def clearPlaceholder(self, event, searchQuery):
         searchQuery.set("")
             
+    def viewSelected(self):
+        selection = self.tasksTable.focus()
+        if(selection):
+            id = self.tasksTable.item(selection, "values")[0]
+            print(selection, id)
+            ViewTask(self.root, taskId=id, parentCallback = self.parentCallback)
+            self.refresh()
+            return None
+        
+        print("select a row please")
         
     def putPlaceholder(self, event, placeholder, searchQuery):
         searchQuery.set(placeholder)
         
     def addTask(self, event):
-        AddTask(self.root)
+        AddTask(self.root, parentCallback = self.parentCallback)
+        self.refresh()
         
     def insertData(self):
-        model = Tasks()
-        data = model.get_tasks()
-        for row in data:
+        if(not self.data):
+            model = Tasks()
+            self.data = model.get_tasks()
+        for row in self.data:
             print(row)
-            self.tasksTable.insert("", "end", text=row[0], values=(row[1], row[3], row[4], "★"*int(row[2])))
-
+            self.tasksTable.insert("", "end", values=(row[0] ,row[1], row[3], row[4], "★"*int(row[2])))
+    
+    def clearTreeview(self):
+        for item in self.tasksTable.get_children():
+            self.tasksTable.delete(item)
+            
+    def refresh(self):
+        self.clearTreeview()
+        self.insertData()
+        
+    def parentCallback(self, *args, **kwargs):
+        if(kwargs["cmd"]=="refresh"):
+            self.refresh()
+            
+    def search(self, *args):
+        query = self.searchQuery.get()
+        if(query==""):
+            self.clearTreeview()
+            self.insertData()
+        else:
+            self.clearTreeview()
+            for row in self.data:
+                print(row)
+                if(query in str(row[0]) or query in str(row[1]) or query in str(row[2]) or query in str(row[3]) or query in str(row[4])):
+                    self.tasksTable.insert("", "end", values=(row[0] ,row[1], row[3], row[4], "★"*int(row[2])))
+        
 if __name__ == "__main__":
     App()
