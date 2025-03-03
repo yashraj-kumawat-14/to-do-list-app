@@ -1,9 +1,19 @@
 from tkinter import Tk, PhotoImage, Frame, Entry, StringVar, Button, Label, Listbox
 from tkinter.messagebox import showinfo
 from pages.addTask import AddTask
+from tkinter import ttk
+import os
+from sys import path
+
+current_script_path = os.path.abspath(__file__)
+directory_path = os.path.dirname(current_script_path)
+parent_dir_path = os.path.dirname(directory_path)
+
+path.append(parent_dir_path)
+from Tasks import Tasks
 
 class App:
-    def __init__(self, title="To-Do List Application", width=400, height=470):
+    def __init__(self, title="To-Do List Application", width=800, height=470):
         self.root = Tk()
         self.root.title(title)
         self.root.geometry(f"{width}x{height}")
@@ -45,8 +55,20 @@ class App:
         self.tasksFrame.rowconfigure(0, weight=1)
         self.tasksFrame.columnconfigure(0, weight=1)
         
-        self.taskBox = Listbox(self.tasksFrame)
-        self.taskBox.grid(row=0, column=0, sticky="nsew")
+        self.tasksTable = ttk.Treeview(self.tasksFrame, columns=("task", "status", "date", "priority"))
+        self.tasksTable.grid(row=0, column=0, sticky="nsew")
+        
+        self.tasksTable.column("#0", width=40, stretch=False, anchor="center")
+        self.tasksTable.column("task", width=100, minwidth=50, anchor="center")
+        self.tasksTable.column("status", width=100, minwidth=50, anchor="center")
+        self.tasksTable.column("date", width=100, minwidth=50, anchor="center")
+        self.tasksTable.column("priority", width=100, minwidth=50, anchor="center")
+        
+        self.tasksTable.heading("#0", text="id", anchor="center")
+        self.tasksTable.heading("task", text="Task", anchor="center")
+        self.tasksTable.heading("status", text="Status", anchor="center")
+        self.tasksTable.heading("date", text="Date", anchor="center")
+        self.tasksTable.heading("priority", text="Priority", anchor="center")
         
         self.actionFrame = Frame(self.mainFrame)
         self.actionFrame.pack(fill="x", side="bottom")
@@ -62,6 +84,8 @@ class App:
         self.viewTaskBtn.grid(row=0, column=1, sticky="we")
         
         self.addTaskBtn.bind("<Button-1>", self.addTask)
+
+        self.insertData()
         
         self.root.mainloop()
         
@@ -74,6 +98,13 @@ class App:
         
     def addTask(self, event):
         AddTask(self.root)
+        
+    def insertData(self):
+        model = Tasks()
+        data = model.get_tasks()
+        for row in data:
+            print(row)
+            self.tasksTable.insert("", "end", text=row[0], values=(row[1], row[3], row[4], "★"*int(row[2])))
 
 if __name__ == "__main__":
     App()
