@@ -4,6 +4,14 @@ conn = sqlite3.connect("todoist.db")
 
 cursor = conn.cursor()
 
+
+cursor.execute('''
+DROP TABLE IF EXISTS tasks              
+''')
+
+
+conn.commit()
+
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
