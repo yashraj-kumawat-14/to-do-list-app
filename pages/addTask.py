@@ -2,24 +2,15 @@ from tkinter import Tk, Frame, Entry, StringVar, Button, Label, Toplevel
 from tkcalendar import DateEntry
 from tkinter.messagebox import showinfo
 from tkinter.ttk import Combobox
-import os
 from time import sleep
-from sys import path
+import sys
+import os
 
-# Get the absolute path to the current script
-current_script_path = os.path.abspath(__file__)
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Extract the directory path
-directory_path = os.path.dirname(current_script_path)
-print(directory_path)
+from model.Tasks import Tasks
 
-# Navigate up to the 'result_management' directory (assuming it's the parent directory)
-parent_directory = os.path.dirname(directory_path)
-print(parent_directory)
-
-path.append(f"{parent_directory}/model")
-
-from Tasks import Tasks
 
 class AddTask:
     def __init__(self, root, parentCallback=None):

@@ -144,6 +144,7 @@ class ViewTask:
             self.addTaskModal.update()
             sleep(2)
             if(self.parentCallback):
+                print("called refresh")
                 self.parentCallback(cmd="refresh")
             self.addTaskModal.destroy()
         except Exception as e:

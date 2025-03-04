@@ -115,8 +115,8 @@ class App:
         AddTask(self.root, parentCallback = self.parentCallback)
         self.refresh()
         
-    def insertData(self):
-        if(not self.data):
+    def insertData(self, cmd=None):
+        if(not self.data or cmd=="fetch"):
             model = Tasks()
             self.data = model.get_tasks()
         for row in self.data:
@@ -129,11 +129,13 @@ class App:
             
     def refresh(self):
         self.clearTreeview()
-        self.insertData()
+        self.insertData(cmd="fetch")
         
     def parentCallback(self, *args, **kwargs):
-        if(kwargs["cmd"]=="refresh"):
-            self.refresh()
+        # if(kwargs["cmd"]=="refresh"):
+        #     self.refresh()
+        print("hello from parent")
+        self.refresh()
             
     def search(self, *args):
         query = self.searchQuery.get()
