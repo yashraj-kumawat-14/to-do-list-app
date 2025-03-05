@@ -8,6 +8,7 @@ from sys import path
 
 # Get the absolute path to the current script
 current_script_path = os.path.abspath(__file__)
+print("file path", current_script_path)
 
 # Extract the directory path
 directory_path = os.path.dirname(current_script_path)
@@ -117,6 +118,7 @@ class ViewTask:
             self.messageLabel.config(text="Success Task is updated.", fg="green")
             self.addTaskModal.update()
             sleep(2)
+            self.parentCallback(cmd="refresh")
             self.addTaskModal.destroy()
         except Exception as e:
             self.messageLabel.config(text="Error Task is didn't updated.", fg="red")
@@ -126,6 +128,8 @@ class ViewTask:
         if(self.taskId):
             model = Tasks()
             data = model.get_task_by_id(id=self.taskId)
+            if not data:
+                return
             self.taskVar.set(data[1])
             self.dateEntry.set_date(data[4])
             self.statusVar.set(data[3])

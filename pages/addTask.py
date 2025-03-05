@@ -9,7 +9,20 @@ import os
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+print("worked path : ",os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.Tasks import Tasks
+
+# Get the absolute path to the current script
+current_script_path = os.path.abspath(__file__)
+print("current_script_path: ", current_script_path)
+
+# Extract the directory path
+directory_path = os.path.dirname(current_script_path)
+print("directory_path : ",directory_path)
+
+# Navigate up to the 'result_management' directory (assuming it's the parent directory)
+parent_directory = os.path.dirname(directory_path)
+print("parent_directory : ", parent_directory)
 
 
 class AddTask:

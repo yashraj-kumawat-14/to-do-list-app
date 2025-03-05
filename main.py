@@ -1,4 +1,4 @@
-from tkinter import Tk, PhotoImage, Frame, Entry, StringVar, Button, Label, Listbox
+from tkinter import Tk, PhotoImage, Frame, Entry, StringVar, Button, Label, Scrollbar
 from tkinter.messagebox import showinfo
 from pages.addTask import AddTask
 from pages.viewTask import ViewTask
@@ -22,7 +22,7 @@ class App:
         self.icon = PhotoImage(file="./assets/app_icon.png")
         self.root.iconphoto(False, self.icon)
         
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
         
         self.mainFrame = Frame(self.root)
         self.mainFrame.pack(fill="both", expand=True)
@@ -60,6 +60,17 @@ class App:
         
         self.tasksTable = ttk.Treeview(self.tasksFrame, columns=("id", "task", "status", "date", "priority"), show="headings")
         self.tasksTable.grid(row=0, column=0, sticky="nsew")
+        
+        self.scrollY = Scrollbar(self.tasksTable, orient="vertical")
+        self.scrollY.pack(side="right", fill="y")
+        
+        self.scrollX = Scrollbar(self.tasksTable, orient="horizontal")
+        self.scrollX.pack(side="bottom", fill="x")
+        
+        self.scrollY.config(command=self.tasksTable.yview)
+        self.scrollX.config(command=self.tasksTable.xview)
+        self.tasksTable.config(yscrollcommand=self.scrollY.set)
+        self.tasksTable.config(xscrollcommand=self.scrollX.set)
         
         self.tasksTable.column("id", width=40, minwidth=30, anchor="center")
         self.tasksTable.column("task", width=100, minwidth=50, anchor="center")
@@ -146,7 +157,7 @@ class App:
             self.clearTreeview()
             for row in self.data:
                 print(row)
-                if(query in str(row[0]) or query in str(row[1]) or query in str(row[2]) or query in str(row[3]) or query in str(row[4])):
+                if(query.lower() in str(row[0]).lower() or query.lower() in str(row[1]).lower() or query.lower() in str(row[2]).lower() or query.lower() in str(row[3]).lower() or query.lower() in str(row[4]).lower()):
                     self.tasksTable.insert("", "end", values=(row[0] ,row[1], row[3], row[4], "★"*int(row[2])))
         
 if __name__ == "__main__":
