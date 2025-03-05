@@ -2,6 +2,14 @@
 
 A simple and efficient To-Do List desktop application built using Python, Tkinter, and SQLite3.
 
+## Screenshots
+
+![Task Management UI](screenshots/1.png)
+
+![Add Task UI](screenshots/2.png)
+
+![View & Edit Task UI](screenshots/3.png)
+
 ## Features
 - Add new tasks
 - Remove existing tasks
