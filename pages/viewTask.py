@@ -32,7 +32,7 @@ class ViewTask:
         # self.addTaskModal.geometry("300x300")
         self.addTaskModal.resizable(False, False)
 
-        self.addTaskModal.title("Add Task")
+        self.addTaskModal.title("View Task")
         self.addTaskModal.transient(root) # transient(self.root) makes the toplevel window keeping attached with main window root, and doesn't get seprated
         
         self.addTaskModal.update_idletasks() # using it to render the toplevel window before making it a model or can say using the grab-set method
